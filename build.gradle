@@ -5,7 +5,10 @@ buildscript {
     repositories {
         maven { url "https://plugins.gradle.org/m2/" }
     }
-    dependencies { classpath "com.gradle.publish:plugin-publish-plugin:0.9.1" }
+    dependencies {
+        classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
+        classpath "org.ajoberstar:grgit:1.1.0"
+    }
 }
 apply plugin: "com.gradle.plugin-publish"
 
@@ -20,6 +23,25 @@ dependencies {
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
+
+ext {
+    def vfile = new File("${projectDir}/version.info")
+    try {
+        git = org.ajoberstar.grgit.Grgit.open("${projectDir}")
+        branch = git.branch.current.name
+        if (!(branch.equals("${project.masterBranch}") || branch.contains("${project.releaseBranchPrefix}"))) {
+            version = "${project.version}-${branch}-${git.head().abbreviatedId}"
+        }
+        vfile.text = version
+    } catch (Exception ex) {
+        println("No Git repository info available, falling back to file")
+        if (vfile.esists) {
+            println("No version file, using project version variable as-is")
+            version = vfile.text
+        }
+    }
+}
+
 
 jar {
     baseName "$artifactId"
@@ -109,4 +131,4 @@ uploadArchives {
 
 
 
-defaultTasks 'clean', 'build', 'check', 'assemble', 'install', 'javadoc', 'uploadArchives'
+defaultTasks 'clean', 'build', 'check', 'assemble', 'install', 'javadoc', 'uploadArchives', 'publishPlugins'
