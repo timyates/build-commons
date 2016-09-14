@@ -29,13 +29,13 @@ ext {
     try {
         git = org.ajoberstar.grgit.Grgit.open("${projectDir}")
         branch = git.branch.current.name
-        if (!(branch.equals("${project.masterBranch}") || branch.contains("${project.releaseBranchPrefix}"))) {
-            version = "${project.version}-${branch}-${git.head().abbreviatedId}"
+        if (!(branch.equals('master') || branch.contains('release'))) {
+            project.version = "${version}-${branch}-${git.head().abbreviatedId}"
         }
         vfile.text = version
     } catch (Exception ex) {
         println("No Git repository info available, falling back to file")
-        if (vfile.exists) {
+        if (vfile.exists()) {
             println("No version file, using project version variable as-is")
             version = vfile.text
         }

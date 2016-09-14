@@ -30,7 +30,7 @@ class BuildCommons implements Plugin<Project> {
                 vfile.text = project.version
             } catch (Exception ex) {
                 println("No Git repository info available, falling back to file")
-                if (vfile.exists) {
+                if (vfile.exists()) {
                     println("No version file, using project version variable as-is")
                     project.version = vfile.text
                 }
