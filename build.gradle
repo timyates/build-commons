@@ -109,4 +109,4 @@ uploadArchives {
 
 
 
-defaultTasks 'wrapper', 'clean', 'build', 'check', 'assemble', 'install', 'javadoc'
+defaultTasks 'wrapper', 'clean', 'build', 'check', 'assemble', 'install', 'javadoc', 'uploadArchives'
