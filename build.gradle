@@ -35,7 +35,7 @@ ext {
         vfile.text = version
     } catch (Exception ex) {
         println("No Git repository info available, falling back to file")
-        if (vfile.esists) {
+        if (vfile.exists) {
             println("No version file, using project version variable as-is")
             version = vfile.text
         }
@@ -131,4 +131,4 @@ uploadArchives {
 
 
 
-defaultTasks 'clean', 'build', 'check', 'assemble', 'install', 'javadoc', 'uploadArchives', 'publishPlugins'
+defaultTasks 'clean', 'build', 'check', 'assemble', 'install', 'javadoc'
