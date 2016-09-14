@@ -1,0 +1,112 @@
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
+
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies { classpath "com.gradle.publish:plugin-publish-plugin:0.9.1" }
+}
+apply plugin: "com.gradle.plugin-publish"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile 'org.ajoberstar:grgit:1.1.0'
+}
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+jar {
+    baseName "$artifactId"
+    manifest {
+        attributes 'Implementation-Title': artifactId, 'Implementation-Version': version
+    }
+}
+
+task wrapper(type: Wrapper) { gradleVersion = gradleVersionToUse }
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    baseName "$artifactId"
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    baseName "$artifactId"
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+pluginBundle {
+    website = 'https://github.com/DanySK/build-commons'
+    vcsUrl = 'https://github.com/DanySK/build-commons'
+    description = 'A rich build configuration, shareable across projects'
+    tags = ['pre-configuration', 'configuration', 'javadoc', 'jar', 'pmd', 'findbugs', 'checkstyle']
+
+    plugins {
+        buildcommonsPlugin {
+            id = 'org.danilopianini.build-commons'
+            displayName = 'build-commons'
+        }
+    }
+}
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+signing {
+    sign configurations.archives
+}
+signArchives.onlyIf { Boolean.parseBoolean(signArchivesIsEnabled) }
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+            pom.project {
+                name artifactId
+                description projectDescription
+                packaging 'jar'
+                url "$scmRootUrl/$artifactId"
+                licenses {
+                    license {
+                        name licenseName
+                        url licenseUrl
+                    }
+                }
+                developers {
+                    developer {
+                            name 'Danilo Pianini'
+                            email 'danilo.pianini@gmail.com'
+                            url 'http://www.danilopianini.org/'
+                    }
+                }
+                scm {
+                    url "$scmRootUrl/$artifactId"
+                    connection "$scmType:$scmLogin/$scmRepoName"
+                    developerConnection "$scmType:$scmLogin/$scmRepoName"
+                }
+            }
+        }
+    }
+}
+
+
+
+defaultTasks 'wrapper', 'clean', 'build', 'check', 'assemble', 'install', 'javadoc'
