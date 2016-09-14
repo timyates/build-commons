@@ -6,6 +6,3 @@ jdk:
 before_install:
   - openssl aes-256-cbc -K $encrypted_c83b41bd1ebb_key -iv $encrypted_c83b41bd1ebb_iv -in prepare_environment.sh.enc -out prepare_environment.sh -d
   - sh prepare_environment.sh
-env:
-  global:
-    secure: "Mq3BVgoV3+VdIzDatH/cHRJj13KRNMm2aASPRzPbFNezE8U57+O9Y56v2kwsGFmv/bUv94POJ24/Wa9jBRAggWvgg71RDpy31A5gx1YlnEYWsPK6SC+JbuU1g0aMa2NeUdd4wVoF9DgC0V946IB/m4ZMP3K9rcq9NxshhxPkVe74atqf46VVfKBdQeEJpFLFz5jKRvk7olsTApBgPOPvQUswCstXeBHGVTBNM47ue5ZxO44eHh/W1j0XpaR8CsR8pl9CcOiVCU6jyTZEEMEn0lSIKGMjYHsgWzsop90jeg1e0ZNWP7HQAMZKYekCm7X2Ebbjzx0kK0NOSsDN/h6pbp2c7GqydVErbuANwaEf3z4/8q+Rasg47ifbyPAaq96XmJrGAx/r/vdUm9jmuXBZPb3diDerIiAUE4bKtK666NNbuevh1zyiWm7U2So+rl+gqF7BbYsMEcb250MCUO4oID6dNJ7ToAWLGhBciFRa0O+AcKn2xS6ZU5kt2md3LPVSJ2axf/n1JxvQe6io38Z8vTX5mxZ/xAGdvvwQDohgq2VeKbfbS1FrXRt5hn/vZVQzi+nEUuQhZg8lw/NMV/+aaIQPIHQYGvq9jTcSb5d9G+AqCHIVFFtGqL3u1Y999mWqtQQl+oj3kt/bcRr8Se1/Q6/7RSPhvjNXxydqvll2Ml8="
