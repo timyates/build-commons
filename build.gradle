@@ -6,7 +6,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
+        classpath "com.gradle.publish:plugin-publish-plugin:0.9.5"
         classpath "org.ajoberstar:grgit:1.1.0"
     }
 }
@@ -29,6 +29,7 @@ ext {
     try {
         git = org.ajoberstar.grgit.Grgit.open("${projectDir}")
         branch = git.branch.current.name
+        println "Current branch is $branch"
         if (!(branch.equals('master') || branch.contains('release'))) {
             project.version = "${version}-${branch}-${git.head().abbreviatedId}"
         }
