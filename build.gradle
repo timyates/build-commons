@@ -31,6 +31,11 @@ ext {
         def currentSha = git.head().id
         def branchMap = [:]
         if (git.branch.current.name.equals('HEAD')) {
+            /* 
+             * We are on a detached head. In this case, check if any of the branches
+             * heads have a matching hash, and in case pick the branch name.
+             * Otherwise, mark as detached.
+             */
             def branches = git.branch.list()
             branches.each {
                 try {
@@ -48,13 +53,6 @@ ext {
         println "at ${git.head().id} on branch ${git.branch.current.name}"
         branch = branchMap.get(currentSha, 'detached')
         println "Current branch is $branch"
-        if (branch.equals('HEAD')) {
-            /* 
-             * We are on a detached head. In this case, check if any of the branches
-             * heads have a matching hash, and in case pick the branch name.
-             * Otherwise, mark as detached.
-             */
-        }
         if (!(branch.equals('master') || branch.contains('release'))) {
             project.version = "${version}-${branch}-${git.head().abbreviatedId}".take(20)
         }
