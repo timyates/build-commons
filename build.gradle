@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.5"
-        classpath "org.ajoberstar:grgit:1.1.0"
+        classpath "org.ajoberstar:grgit:1.7.0"
     }
 }
 apply plugin: "com.gradle.plugin-publish"
@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'org.ajoberstar:grgit:1.1.0'
+    compile 'org.ajoberstar:grgit:1.7.0'
 }
 
 sourceCompatibility = 1.6
@@ -28,13 +28,33 @@ ext {
     def vfile = new File("${projectDir}/version.info")
     try {
         git = org.ajoberstar.grgit.Grgit.open("${projectDir}")
-        branch = git.branch.current.name
+        branches = git.branch.list()
+        currentSha = git.head().id
+        def branchMap = [:]
+        branches.each {
+            try {
+                git.checkout(branch: it.name)
+                branchMap[git.head().id] = it.name
+            } catch (org.ajoberstar.grgit.exception.GrgitException e) {
+                println "Could not check out ${it.name}:"
+                e.printStackTrace()
+            }
+        }
+        branch = branchMap.get(currentSha, 'detached')
         println "Current branch is $branch"
+        if (branch.equals('HEAD')) {
+            /* 
+             * We are on a detached head. In this case, check if any of the branches
+             * heads have a matching hash, and in case pick the branch name.
+             * Otherwise, mark as detached.
+             */
+        }
         if (!(branch.equals('master') || branch.contains('release'))) {
             project.version = "${version}-${branch}-${git.head().abbreviatedId}"
         }
         vfile.text = version
     } catch (Exception ex) {
+        ex.printStackTrace()
         println("No Git repository info available, falling back to file")
         if (vfile.exists()) {
             println("No version file, using project version variable as-is")
