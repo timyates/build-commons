@@ -52,7 +52,7 @@ ext {
              */
         }
         if (!(branch.equals('master') || branch.contains('release'))) {
-            project.version = "${version}-${branch}-${git.head().abbreviatedId}"
+            project.version = "${version}-${branch}-${git.head().abbreviatedId}".take(20)
         }
         vfile.text = version
     } catch (Exception ex) {
