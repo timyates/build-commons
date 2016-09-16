@@ -36,10 +36,12 @@ ext {
                 git.checkout(branch: it.name)
                 branchMap[git.head().id] = it.name
             } catch (org.ajoberstar.grgit.exception.GrgitException e) {
-                println "Could not check out ${it.name}:"
-                e.printStackTrace()
+                println "Could not check out ${it.name}"
             }
         }
+        println "checking out ${currentSha}"
+        git.checkout(branch: currentSha)
+        println "at ${git.head().id} on branch ${git.branch.current.name}"
         branch = branchMap.get(currentSha, 'detached')
         println "Current branch is $branch"
         if (branch.equals('HEAD')) {
