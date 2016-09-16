@@ -27,20 +27,24 @@ targetCompatibility = 1.6
 ext {
     def vfile = new File("${projectDir}/version.info")
     try {
-        git = org.ajoberstar.grgit.Grgit.open("${projectDir}")
-        branches = git.branch.list()
-        currentSha = git.head().id
+        def git = org.ajoberstar.grgit.Grgit.open("${projectDir}")
+        def currentSha = git.head().id
         def branchMap = [:]
-        branches.each {
-            try {
-                git.checkout(branch: it.name)
-                branchMap[git.head().id] = it.name
-            } catch (org.ajoberstar.grgit.exception.GrgitException e) {
-                println "Could not check out ${it.name}"
+        if (git.branch.current.name.equals('HEAD')) {
+            def branches = git.branch.list()
+            branches.each {
+                try {
+                    git.checkout(branch: it.name)
+                    branchMap[git.head().id] = it.name
+                } catch (org.ajoberstar.grgit.exception.GrgitException e) {
+                    println "Could not check out ${it.name}"
+                }
             }
+            println "checking out ${currentSha}"
+            git.checkout(branch: currentSha)
+        } else {
+            branchMap[currentSha] = git.branch.current.name
         }
-        println "checking out ${currentSha}"
-        git.checkout(branch: currentSha)
         println "at ${git.head().id} on branch ${git.branch.current.name}"
         branch = branchMap.get(currentSha, 'detached')
         println "Current branch is $branch"
