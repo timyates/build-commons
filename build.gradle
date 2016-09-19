@@ -1,0 +1,159 @@
+apply plugin: 'groovy'
+apply plugin: 'eclipse'
+
+buildscript {
+    repositories {
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "com.gradle.publish:plugin-publish-plugin:0.9.5"
+        classpath "org.ajoberstar:gradle-git:+"
+    }
+}
+apply plugin: "com.gradle.plugin-publish"
+apply plugin: "org.ajoberstar.grgit"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile 'org.ajoberstar:gradle-git:1.6.0-rc.1'
+}
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+
+ext {
+    def vfile = new File("${projectDir}/version.info")
+    try {
+        def currentSha = grgit.head().id
+        def branchMap = [:]
+        if (grgit.branch.current.name.equals('HEAD')) {
+            /* 
+             * We are on a detached head. In this case, check if any of the branches
+             * heads have a matching hash, and in case pick the branch name.
+             * Otherwise, mark as detached.
+             */
+            def branches = grgit.branch.list()
+            branches.each {
+                try {
+                    grgit.checkout(branch: it.name)
+                    branchMap[grgit.head().id] = it.name
+                } catch (org.ajoberstar.grgit.exception.GrgitException e) {
+                    println "Could not check out ${it.name}"
+                }
+            }
+            println "checking out ${currentSha}"
+            grgit.checkout(branch: currentSha)
+        } else {
+            branchMap[currentSha] = grgit.branch.current.name
+        }
+        println "at ${grgit.head().id} on branch ${grgit.branch.current.name}"
+        branch = branchMap.get(currentSha, 'detached')
+        println "Current branch is $branch"
+        if (!(branch.equals('master') || branch.contains('release'))) {
+            project.version = "${version}-${branch}-${grgit.head().abbreviatedId}".take(20)
+        }
+        vfile.text = version
+    } catch (Exception ex) {
+        ex.printStackTrace()
+        println("No Git repository info available, falling back to file")
+        if (vfile.exists()) {
+            println("No version file, using project version variable as-is")
+            version = vfile.text
+        }
+    }
+}
+
+
+jar {
+    baseName "$artifactId"
+    manifest {
+        attributes 'Implementation-Title': artifactId, 'Implementation-Version': version
+    }
+}
+
+task wrapper(type: Wrapper) { gradleVersion = gradleVersionToUse }
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    baseName "$artifactId"
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    baseName "$artifactId"
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+pluginBundle {
+    website = 'https://github.com/DanySK/build-commons'
+    vcsUrl = 'https://github.com/DanySK/build-commons'
+    description = 'A rich build configuration, shareable across projects'
+    tags = ['pre-configuration', 'configuration', 'javadoc', 'jar', 'pmd', 'findbugs', 'checkstyle']
+
+    plugins {
+        buildcommonsPlugin {
+            id = 'org.danilopianini.build-commons'
+            displayName = 'build-commons'
+        }
+    }
+}
+
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+signing {
+    sign configurations.archives
+}
+signArchives.onlyIf { Boolean.parseBoolean(signArchivesIsEnabled) }
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+            pom.project {
+                name artifactId
+                description projectDescription
+                packaging 'jar'
+                url "$scmRootUrl/$artifactId"
+                licenses {
+                    license {
+                        name licenseName
+                        url licenseUrl
+                    }
+                }
+                developers {
+                    developer {
+                            name 'Danilo Pianini'
+                            email 'danilo.pianini@gmail.com'
+                            url 'http://www.danilopianini.org/'
+                    }
+                }
+                scm {
+                    url "$scmRootUrl/$artifactId"
+                    connection "$scmType:$scmLogin/$scmRepoName"
+                    developerConnection "$scmType:$scmLogin/$scmRepoName"
+                }
+            }
+        }
+    }
+}
+
+
+
+defaultTasks 'clean', 'build', 'check', 'assemble', 'install', 'javadoc'
