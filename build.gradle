@@ -8,9 +8,11 @@ buildscript {
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.5"
         classpath "org.ajoberstar:grgit:1.7.0"
+        classpath "org.ajoberstar:gradle-git:+"
     }
 }
 apply plugin: "com.gradle.plugin-publish"
+apply plugin: "org.ajoberstar.grgit"
 
 repositories {
     mavenCentral()
@@ -27,34 +29,33 @@ targetCompatibility = 1.6
 ext {
     def vfile = new File("${projectDir}/version.info")
     try {
-        def git = org.ajoberstar.grgit.Grgit.open("${projectDir}")
-        def currentSha = git.head().id
+        def currentSha = grgit.head().id
         def branchMap = [:]
-        if (git.branch.current.name.equals('HEAD')) {
+        if (grgit.branch.current.name.equals('HEAD')) {
             /* 
              * We are on a detached head. In this case, check if any of the branches
              * heads have a matching hash, and in case pick the branch name.
              * Otherwise, mark as detached.
              */
-            def branches = git.branch.list()
+            def branches = grgit.branch.list()
             branches.each {
                 try {
-                    git.checkout(branch: it.name)
-                    branchMap[git.head().id] = it.name
+                    grgit.checkout(branch: it.name)
+                    branchMap[grgit.head().id] = it.name
                 } catch (org.ajoberstar.grgit.exception.GrgitException e) {
                     println "Could not check out ${it.name}"
                 }
             }
             println "checking out ${currentSha}"
-            git.checkout(branch: currentSha)
+            grgit.checkout(branch: currentSha)
         } else {
-            branchMap[currentSha] = git.branch.current.name
+            branchMap[currentSha] = grgit.branch.current.name
         }
-        println "at ${git.head().id} on branch ${git.branch.current.name}"
+        println "at ${grgit.head().id} on branch ${grgit.branch.current.name}"
         branch = branchMap.get(currentSha, 'detached')
         println "Current branch is $branch"
         if (!(branch.equals('master') || branch.contains('release'))) {
-            project.version = "${version}-${branch}-${git.head().abbreviatedId}".take(20)
+            project.version = "${version}-${branch}-${grgit.head().abbreviatedId}".take(20)
         }
         vfile.text = version
     } catch (Exception ex) {
