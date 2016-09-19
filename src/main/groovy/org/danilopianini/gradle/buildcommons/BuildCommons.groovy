@@ -12,9 +12,14 @@ import org.gradle.jvm.tasks.Jar;;;
 
 class BuildCommons implements Plugin<Project> {
     void apply(Project project) {
-        project.apply plugin: 'java'
-        project.apply plugin: 'project-report'
-        project.apply plugin: 'build-dashboard'
+        project {
+            apply {
+                plugin: 'java'
+                plugin: 'project-report'
+                plugin: 'build-dashboard'
+                plugin: "org.ajoberstar.grgit"
+            }
+        }
         project.repositories {
             mavenCentral()
         }
@@ -22,13 +27,37 @@ class BuildCommons implements Plugin<Project> {
         project.ext {
             def vfile = new File("${projectDir}/version.info")
             try {
-                git = org.ajoberstar.grgit.Grgit.open("${projectDir}")
-                branch = git.branch.current.name
-                if (!(branch.equals("${project.masterBranch}") || branch.contains("${project.releaseBranchPrefix}"))) {
-                    project.version = "${project.version}-${branch}-${git.head().abbreviatedId}"
+                def currentSha = grgit.head().id
+                def branchMap = [:]
+                if (grgit.branch.current.name.equals('HEAD')) {
+                    /* 
+                     * We are on a detached head. In this case, check if any of the branches
+                     * heads have a matching hash, and in case pick the branch name.
+                     * Otherwise, mark as detached.
+                     */
+                    def branches = grgit.branch.list()
+                    branches.each {
+                        try {
+                            grgit.checkout(branch: it.name)
+                            branchMap[grgit.head().id] = it.name
+                        } catch (org.ajoberstar.grgit.exception.GrgitException e) {
+                            println "Could not check out ${it.name}"
+                        }
+                    }
+                    println "checking out ${currentSha}"
+                    grgit.checkout(branch: currentSha)
+                } else {
+                    branchMap[currentSha] = grgit.branch.current.name
+                }
+                println "at ${grgit.head().id} on branch ${grgit.branch.current.name}"
+                branch = branchMap.get(currentSha, 'detached')
+                println "Current branch is $branch"
+                if (!(branch.equals('master') || branch.contains('release'))) {
+                    project.version = "${project.version}-${branch}-${grgit.head().abbreviatedId}".take(20)
                 }
                 vfile.text = project.version
             } catch (Exception ex) {
+                ex.printStackTrace()
                 println("No Git repository info available, falling back to file")
                 if (vfile.exists()) {
                     println("No version file, using project version variable as-is")
