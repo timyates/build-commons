@@ -7,7 +7,6 @@ buildscript {
     }
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.5"
-        classpath "org.ajoberstar:grgit:1.7.0"
         classpath "org.ajoberstar:gradle-git:+"
     }
 }
@@ -20,7 +19,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'org.ajoberstar:grgit:1.7.0'
+    compile 'org.ajoberstar:gradle-git:1.6.0-rc.1'
 }
 
 sourceCompatibility = 1.6
