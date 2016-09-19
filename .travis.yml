@@ -7,4 +7,5 @@ before_install:
   - git branch -v
 script:
   - ./gradlew
-  - ./gradlew uploadArchives publishPlugins
+  - ./gradlew uploadArchives
+  - ./gradlew publishPlugins || :
