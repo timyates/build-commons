@@ -19,7 +19,6 @@ class BuildCommons implements Plugin<Project> {
         project.repositories {
             mavenCentral()
         }
-        println "Ciaone"
         def projectDir = project.projectDir
         project.ext {
             def vfile = new File("${projectDir}/version.info")
