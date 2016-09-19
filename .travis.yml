@@ -8,4 +8,4 @@ before_install:
 script:
   - ./gradlew
   - ./gradlew uploadArchives
-  - ./gradlew publishPlugins || :
+  - ./gradlew publishPlugins || exit 0
