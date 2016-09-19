@@ -12,17 +12,14 @@ import org.gradle.jvm.tasks.Jar;;;
 
 class BuildCommons implements Plugin<Project> {
     void apply(Project project) {
-        project {
-            apply {
-                plugin: 'java'
-                plugin: 'project-report'
-                plugin: 'build-dashboard'
-                plugin: "org.ajoberstar.grgit"
-            }
-        }
+        project.apply plugin: 'java'
+        project.apply plugin: 'project-report'
+        project.apply plugin: 'build-dashboard'
+        project.apply plugin: "org.ajoberstar.grgit"
         project.repositories {
             mavenCentral()
         }
+        println "Ciaone"
         def projectDir = project.projectDir
         project.ext {
             def vfile = new File("${projectDir}/version.info")
