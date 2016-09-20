@@ -207,7 +207,7 @@ class BuildCommons implements Plugin<Project> {
                 mavenDeployer {
                     def user = project.ossrhUsername
                     def pwd = project.ossrhPassword
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                    beforeDeployment { MavenDeployment deployment -> project.signing.signPom(deployment) }
                     repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
                         authentication(userName: user, password: pwd)
                     }
