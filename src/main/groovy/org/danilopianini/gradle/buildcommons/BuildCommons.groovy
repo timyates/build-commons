@@ -5,10 +5,10 @@ import org.gradle.api.Plugin
 import org.gradle.api.artifacts.DependencyResolveDetails
 import org.gradle.api.artifacts.maven.MavenDeployment
 import org.gradle.api.plugins.quality.FindBugs
-import org.gradle.api.plugins.quality.Pmd;
-import org.gradle.api.tasks.javadoc.Javadoc;
+import org.gradle.api.plugins.quality.Pmd
+import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.wrapper.Wrapper
-import org.gradle.jvm.tasks.Jar;;;
+import org.gradle.jvm.tasks.Jar
 
 class BuildCommons implements Plugin<Project> {
     void apply(Project project) {
