@@ -68,10 +68,6 @@ class BuildCommons implements Plugin<Project> {
             doc { transitive false }
             doclet
         }
-        project.dependencies {
-            testCompile "junit:junit:${project.junitVersion}"
-            doclet "org.jboss.apiviz:apiviz:${project.apivizVersion}"
-        }
         project.task(type: Wrapper, 'wrapper') << {
             gradleVersion = project.gradleWrapperVersion
         }
@@ -88,27 +84,6 @@ class BuildCommons implements Plugin<Project> {
                 attributes 'Implementation-Title': project.artifactId, 'Implementation-Version': project.version
             }
         }
-        project.task(type: Javadoc, overwrite: true, 'javadoc') {
-            source project.configurations.doc.collect { zipTree(it) }
-            def mainSourceSets = project.sourceSets.main
-            source mainSourceSets.allJava
-            classpath = mainSourceSets.output + mainSourceSets.compileClasspath
-            include '**/*.java'
-            destinationDir project.file("${project.buildDir}/docs/javadoc/")
-            failOnError = false
-            def longName = "${project.longName}"
-            options {
-                showAll()
-                addBooleanOption('nopackagediagram', true)
-                addStringOption('Xdoclint:none', '-quiet')
-                windowTitle "${longName} version ${project.version} Javadoc API"
-                docTitle "${longName} ${project.version} reference API"
-                links 'http://docs.oracle.com/javase/8/docs/api/'
-                links 'http://trove4j.sourceforge.net/javadocs/'
-                doclet 'org.jboss.apiviz.APIviz'
-                docletpath project.file(project.configurations.doclet.asPath)
-            }
-        }
         project.task(type: Jar, dependsOn: project.classes, 'sourcesJar') {
             classifier = 'sources'
             from project.sourceSets.main.allSource
@@ -120,15 +95,6 @@ class BuildCommons implements Plugin<Project> {
         project.artifacts {
             archives project.sourcesJar
             archives project.javadocJar
-        }
-        project.task(type: Jar, 'fatJar') {
-            baseName = project.name + '-complete'
-            from(project.configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
-                exclude "META-INF/*.SF"
-                exclude "META-INF/*.DSA"
-                exclude "META-INF/*.RSA"
-            }
-            with project.jar
         }
         // Code quality
         project.apply plugin: 'findbugs'
