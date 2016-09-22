@@ -1,6 +1,6 @@
 # build-commons
 
-This plugin pre-configures Gradle for providing a rich java build. It enables a number of other plugins, including Eclipse, PMD, Checkstyle, Findbugs, BuildDashboard. Also, it configures apiviz to generate UML schemas inside the Javadocs, provides a signature service, a wrapper task, pom generation and upload on OSSRH
+This plugin pre-configures Gradle for providing a rich java build. It enables a number of other plugins, including Eclipse, PMD, Checkstyle, Findbugs, BuildDashboard. Also, it provides a signature service, a wrapper task, pom generation and upload on OSSRH
 
 ## Usage
 
@@ -37,7 +37,6 @@ The following Gradle properties are required for this plugin in order to work. Y
 * `jdkVersion` the target version of the JDK
 * `junitVersion` the JUnit version
 * `pmdVersion` the PMD version
-* `apivizVersion` the apiviz version, usually `1.3.2.GA`
 * `pmdConfigFile` the path of the file where your pmd configuration is stored, relative to the project
 * `pmdTargetJdk` the PMD target JDK. Usually `1.7`
 * `checkstyleConfigFile` the path of the checkstyle rule file, relative to the project
