@@ -202,7 +202,5 @@ class BuildCommons implements Plugin<Project> {
                 }
             }
         }
-        // Default tasks
-        project.defaultTasks 'wrapper', 'clean', 'build', 'check', 'assemble', 'install', 'javadoc', 'buildDashboard', 'fatJar'
     }
 }
