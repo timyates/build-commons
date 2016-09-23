@@ -77,6 +77,33 @@ class BuildCommons implements Plugin<Project> {
                 exceptionFormat = 'full'
             }
         }
+        // Docs
+        project.javadoc {
+            destinationDir project.file("${project.buildDir}/docs/javadoc/")
+            failOnError = false
+            def longName = "${project.longName}"
+            options {
+                showAll()
+                addStringOption('Xdoclint:none', '-quiet')
+                windowTitle "${longName} version ${project.version} Javadoc API"
+                docTitle "${longName} ${project.version} reference API"
+                links 'http://docs.oracle.com/javase/8/docs/api/'
+                links 'http://trove4j.sourceforge.net/javadocs/'
+                doclet 'org.jboss.apiviz.APIviz'
+                def home = "${System.properties['user.home']}/"
+                def gradleCache = ".gradle/caches/modules-2/files-2.1/org.jboss.apiviz/"
+                def searchFolder = "${home}${gradleCache}".replace('/',"${File.separator}")
+                def fileList = []
+                def apivizVersion = BuildCommons.getClassLoader().getResourceAsStream('apiviz.version').text
+                def targetName = "apiviz-${apivizVersion}.jar".toString()
+                new File(searchFolder).eachFileRecurse {
+                    if(it.name.equals(targetName)) {
+                        docletpath project.file(it.absolutePath)
+                    }
+                }
+                addBooleanOption('nopackagediagram', true)
+            }
+        }
         // Artifacts
         project.compileJava.options.encoding = 'UTF-8'
         project.jar {
@@ -203,6 +230,6 @@ class BuildCommons implements Plugin<Project> {
             }
         }
         // Default tasks
-        project.defaultTasks 'wrapper', 'clean', 'build', 'check', 'assemble', 'install', 'buildDashboard'
+        project.defaultTasks 'wrapper', 'clean', 'build', 'check', 'assemble', 'install', 'javadoc', 'buildDashboard'
     }
 }
