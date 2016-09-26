@@ -71,6 +71,7 @@ class BuildCommons implements Plugin<Project> {
         }
         project.sourceCompatibility = project.jdkVersion
         project.targetCompatibility = project.jdkVersion
+        project.compileJava.options.encoding = 'UTF-8'
         project.repositories { mavenCentral() }
         project.configurations {
             doc { transitive false }
@@ -256,7 +257,7 @@ class BuildCommons implements Plugin<Project> {
         makeDependency(project, 'buildDashboard', 'jacocoTestReport')
         makeDependency(project, 'buildDashboard', 'check')
         makeDependency(project, 'jacocoTestReport', 'check')
-        project.defaultTasks 'wrapper', 'clean', 'build', 'check', 'assemble', 'install', 'javadoc', 'buildDashboard'
+        project.defaultTasks 'clean', 'build', 'check', 'assemble', 'install', 'javadoc', 'buildDashboard'
     }
     
     void makeDependency(project, target, source) {
