@@ -1,6 +1,7 @@
 package org.danilopianini.gradle.buildcommons
 
 import org.gradle.api.Project
+import org.gradle.api.JavaVersion;
 import org.gradle.api.Plugin
 import org.gradle.api.artifacts.DependencyResolveDetails
 import org.gradle.api.artifacts.maven.MavenDeployment
@@ -13,9 +14,16 @@ import org.gradle.jvm.tasks.Jar
 class BuildCommons implements Plugin<Project> {
     void apply(Project project) {
         project.apply plugin: 'java'
+        project.apply plugin: 'eclipse'
+        project.apply plugin: 'findbugs'
+        project.apply plugin: 'pmd'
+        project.apply plugin: 'checkstyle'
         project.apply plugin: 'project-report'
         project.apply plugin: 'build-dashboard'
         project.apply plugin: "org.ajoberstar.grgit"
+        project.apply plugin: 'jacoco'
+        project.apply plugin: 'maven'
+        project.apply plugin: 'signing'
         project.repositories {
             mavenCentral()
         }
@@ -77,6 +85,14 @@ class BuildCommons implements Plugin<Project> {
                 exceptionFormat = 'full'
             }
         }
+        project.jacocoTestReport {
+            reports {
+                xml.enabled false
+                csv.enabled false
+                html.enabled true
+            }
+        }
+        project.jacocoTestReport.dependsOn project.tasks.getByName('test')
         // Docs
         project.javadoc {
             destinationDir project.file("${project.buildDir}/docs/javadoc/")
@@ -126,9 +142,16 @@ class BuildCommons implements Plugin<Project> {
         // Code quality
         project.apply plugin: 'findbugs'
         project.findbugs {
+            if (JavaVersion.current().isJava6()) {
+                toolVersion = "2.0.3"
+            }
             ignoreFailures = true
             effort = "max"
             reportLevel = "low"
+            def excludeFile = new File("${project.rootProject.projectDir}/findbugsExcludes.xml");
+            if (excludeFile.exists()) {
+                excludeFilterConfig = project.resources.text.fromFile(excludeFile)
+            }
         }
         project.tasks.withType(FindBugs) {
             reports {
@@ -230,6 +253,13 @@ class BuildCommons implements Plugin<Project> {
             }
         }
         // Default tasks
+        makeDependency(project, 'buildDashboard', 'jacocoTestReport')
+        makeDependency(project, 'buildDashboard', 'check')
+        makeDependency(project, 'jacocoTestReport', 'check')
         project.defaultTasks 'wrapper', 'clean', 'build', 'check', 'assemble', 'install', 'javadoc', 'buildDashboard'
+    }
+    
+    void makeDependency(project, target, source) {
+        project.tasks.getByName(target).dependsOn project.tasks.getByName(source)
     }
 }
