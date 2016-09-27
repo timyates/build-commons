@@ -39,6 +39,7 @@ The following Gradle properties are required for this plugin in order to work. Y
 * `pmdVersion` the PMD version
 * `pmdConfigFile` the path of the file where your pmd configuration is stored, relative to the project
 * `pmdTargetJdk` the PMD target JDK. Usually `1.7`
+* `apivizVersion` The APIViz version to use, usually `1.3.2.GA`
 * `checkstyleConfigFile` the path of the checkstyle rule file, relative to the project
 * `signArchivesIsEnabled` if `true`, the plugin will attempt at signing the artifacts. In this case, also the `signing.keyId`, `signing.password`, and `signing.secretKeyRingFile` must be set (as per signing Gradle plugin setting). Also, you must have properly configured GPG
 * `ossrhUsername` username for OSSRH. Do not write it in clear text
