@@ -46,7 +46,7 @@ ext {
         } else {
             project.version = "${project.version}-${tag}-${grgit.head().abbreviatedId}".take(20)
         }
-        vfile.text = version
+        vfile.text = project.version
     } catch (Exception ex) {
         ex.printStackTrace()
         println("No Git repository info available, falling back to file")
