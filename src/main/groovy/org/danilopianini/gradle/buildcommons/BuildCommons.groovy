@@ -24,6 +24,7 @@ class BuildCommons implements Plugin<Project> {
         project.apply plugin: 'jacoco'
         project.apply plugin: 'maven'
         project.apply plugin: 'signing'
+        apply plugin: 'io.codearte.nexus-staging'
         project.repositories {
             mavenCentral()
         }
