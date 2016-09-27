@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.5"
-        classpath "org.ajoberstar:gradle-git:+"
+        classpath "org.ajoberstar:gradle-git:1.6.0-rc.1"
         classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
     }
 }
@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     compile gradleApi()
-    compile 'org.ajoberstar:gradle-git:+'
+    compile 'org.ajoberstar:gradle-git:1.6.0-rc.1'
     compile 'org.jboss.apiviz:apiviz:1.3.2.GA'
     compile 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
 }
