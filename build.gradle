@@ -8,6 +8,7 @@ buildscript {
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.5"
         classpath "org.ajoberstar:gradle-git:+"
+        classpath 'io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3'
     }
 }
 apply plugin: "com.gradle.plugin-publish"

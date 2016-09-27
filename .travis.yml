@@ -6,5 +6,5 @@ before_install:
   - sh prepare_environment.sh
 script:
   - ./gradlew
-  - ./gradlew uploadArchives
+  - ./gradlew uploadArchives closeRepository
   - ./gradlew publishPlugins || exit 0
