@@ -13,6 +13,7 @@ buildscript {
 }
 apply plugin: "com.gradle.plugin-publish"
 apply plugin: "org.ajoberstar.grgit"
+apply plugin: 'io.codearte.nexus-staging'
 
 repositories {
     mavenCentral()
@@ -32,31 +33,17 @@ ext {
     try {
         def currentSha = grgit.head().id
         def branchMap = [:]
-        if (grgit.branch.current.name.equals('HEAD')) {
-            /* 
-             * We are on a detached head. In this case, check if any of the branches
-             * heads have a matching hash, and in case pick the branch name.
-             * Otherwise, mark as detached.
-             */
-            def branches = grgit.branch.list()
-            branches.each {
-                try {
-                    grgit.checkout(branch: it.name)
-                    branchMap[grgit.head().id] = it.name
-                } catch (org.ajoberstar.grgit.exception.GrgitException e) {
-                    println "Could not check out ${it.name}"
-                }
-            }
-            println "checking out ${currentSha}"
-            grgit.checkout(branch: currentSha)
+        /*
+         * Check if it is a tagged version
+         */
+        def tags = grgit.tag.list()
+        def tag = tags.find() { it.commit.id == currentSha }
+        if (tag == null) {
+            project.version = "${project.version}-${grgit.head().abbreviatedId}".take(20)
+        } else if (tag.name == version){
+            println "This is tagged as the official version ${version}"
         } else {
-            branchMap[currentSha] = grgit.branch.current.name
-        }
-        println "at ${grgit.head().id} on branch ${grgit.branch.current.name}"
-        branch = branchMap.get(currentSha, 'detached')
-        println "Current branch is $branch"
-        if (!(branch.equals('master') || branch.contains('release'))) {
-            project.version = "${version}-${branch}-${grgit.head().abbreviatedId}".take(20)
+            project.version = "${project.version}-${tag}-${grgit.head().abbreviatedId}".take(20)
         }
         vfile.text = version
     } catch (Exception ex) {
