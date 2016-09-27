@@ -24,7 +24,7 @@ class BuildCommons implements Plugin<Project> {
         project.apply plugin: 'jacoco'
         project.apply plugin: 'maven'
         project.apply plugin: 'signing'
-        apply plugin: 'io.codearte.nexus-staging'
+        project.apply plugin: 'io.codearte.nexus-staging'
         project.repositories {
             mavenCentral()
         }
@@ -34,39 +34,26 @@ class BuildCommons implements Plugin<Project> {
             try {
                 def currentSha = grgit.head().id
                 def branchMap = [:]
-                if (grgit.branch.current.name.equals('HEAD')) {
-                    /* 
-                     * We are on a detached head. In this case, check if any of the branches
-                     * heads have a matching hash, and in case pick the branch name.
-                     * Otherwise, mark as detached.
-                     */
-                    def branches = grgit.branch.list()
-                    branches.each {
-                        try {
-                            grgit.checkout(branch: it.name)
-                            branchMap[grgit.head().id] = it.name
-                        } catch (org.ajoberstar.grgit.exception.GrgitException e) {
-                            println "Could not check out ${it.name}"
-                        }
-                    }
-                    println "checking out ${currentSha}"
-                    grgit.checkout(branch: currentSha)
+                /*
+                 * Check if it is a tagged version
+                 */
+                def tags = grgit.tag.list()
+                def tag = tags.find() { it.commit.id == currentSha }
+                if (tag == null) {
+                    project.version = "${project.version}-${grgit.head().abbreviatedId}".take(20)
+                } else if (tag.name == project.version){
+                    println "This is tagged as the official version ${version}"
                 } else {
-                    branchMap[currentSha] = grgit.branch.current.name
+                    project.version = "${project.version}-${tag.name}-${grgit.head().abbreviatedId}".take(20)
                 }
-                println "at ${grgit.head().id} on branch ${grgit.branch.current.name}"
-                branch = branchMap.get(currentSha, 'detached')
-                println "Current branch is $branch"
-                if (!(branch.equals('master') || branch.contains('release'))) {
-                    project.version = "${project.version}-${branch}-${grgit.head().abbreviatedId}".take(20)
-                }
+                println "Due to your git repo status, the project version is detected as ${project.version}"
                 vfile.text = project.version
             } catch (Exception ex) {
                 ex.printStackTrace()
                 println("No Git repository info available, falling back to file")
                 if (vfile.exists()) {
                     println("No version file, using project version variable as-is")
-                    project.version = vfile.text
+                    version = vfile.text
                 }
             }
         }
