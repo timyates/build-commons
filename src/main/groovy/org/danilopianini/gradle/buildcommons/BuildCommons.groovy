@@ -24,7 +24,10 @@ class BuildCommons implements Plugin<Project> {
         project.apply plugin: 'jacoco'
         project.apply plugin: 'maven'
         project.apply plugin: 'signing'
-        project.apply plugin: 'io.codearte.nexus-staging'
+        def isParent = project.parent == null
+        if (isParent) {
+            project.apply plugin: 'io.codearte.nexus-staging'
+        }
         project.repositories {
             mavenCentral()
         }
@@ -65,8 +68,10 @@ class BuildCommons implements Plugin<Project> {
             doc { transitive false }
             doclet
         }
-        project.task(type: Wrapper, 'wrapper') << {
-            gradleVersion = project.gradleWrapperVersion
+        if (isParent) {
+            project.task(type: Wrapper, 'wrapper') << {
+                gradleVersion = project.gradleWrapperVersion
+            }
         }
         // Tests
         project.test {
