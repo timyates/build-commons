@@ -45,7 +45,7 @@ class BuildCommons implements Plugin<Project> {
                 if (tag == null) {
                     project.version = "${project.version}-${grgit.head().abbreviatedId}".take(20)
                 } else if (tag.name == project.version){
-                    println "This is tagged as the official version ${version}"
+                    println "This is tagged as the official version ${project.version}"
                 } else {
                     project.version = "${project.version}-${tag.name}-${grgit.head().abbreviatedId}".take(20)
                 }
