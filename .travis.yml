@@ -7,5 +7,4 @@ before_install:
 script:
   - ./gradlew
   - ./gradlew uploadArchives
-  - ./gradlew closeRepository || exit 0
-  - ./gradlew publishPlugins || exit 0
+  - ./gradlew closeRepository publishPlugins --continue || exit 0
