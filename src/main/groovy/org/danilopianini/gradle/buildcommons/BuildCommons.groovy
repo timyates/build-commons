@@ -94,7 +94,9 @@ class BuildCommons implements Plugin<Project> {
             def longName = "${project.longName}"
             options {
                 showAll()
-                addStringOption('Xdoclint:none', '-quiet')
+                if (JavaVersion.current().isJava8Compatible()) {
+                    addStringOption('Xdoclint:none', '-quiet')
+                }
                 windowTitle "${longName} version ${project.version} Javadoc API"
                 docTitle "${longName} ${project.version} reference API"
                 links 'http://docs.oracle.com/javase/8/docs/api/'
