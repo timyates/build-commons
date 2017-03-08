@@ -69,8 +69,10 @@ class BuildCommons implements Plugin<Project> {
             doclet
         }
         if (isParent) {
-            project.task(type: Wrapper, 'wrapper') << {
-                gradleVersion = project.gradleWrapperVersion
+            project.task(type: Wrapper, 'wrapper') {
+                doLast {
+                    gradleVersion = project.gradleWrapperVersion
+                }
             }
         }
         // Tests
@@ -186,16 +188,22 @@ class BuildCommons implements Plugin<Project> {
             configFile = new File("${project.rootProject.projectDir}/${project.checkstyleConfigFile}")
         }
         def xsl = BuildCommons.getClassLoader().getResourceAsStream('checkstyle-noframes-sorted.xsl').text
-        project.checkstyleMain << {
-            ant.xslt(in: reports.xml.destination,
-            out: new File(reports.xml.destination.parent, 'main.html')) {
-                style { string(value: xsl) }
+        project.checkstyleMain {
+            doLast {
+                ant.xslt(
+                    in: reports.xml.destination,
+                    out: new File(reports.xml.destination.parent, 'main.html')) {
+                        style { string(value: xsl) }
+                    }
             }
         }
-        project.checkstyleTest << {
-            ant.xslt(in: reports.xml.destination,
-            out: new File(reports.xml.destination.parent, 'main.html')) {
-                style { string(value: xsl) }
+        project.checkstyleTest {
+            doLast {
+                ant.xslt(
+                    in: reports.xml.destination,
+                    out: new File(reports.xml.destination.parent, 'main.html')) {
+                        style { string(value: xsl) }
+                    }
             }
         }
         // Eclipse
