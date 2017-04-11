@@ -3,3 +3,4 @@ build/
 bin/
 version.info
 .directory
+prepare_environment.sh
