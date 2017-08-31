@@ -8,7 +8,7 @@ env:
     - secure: "oBUn6KLylOHKoGfP2bP8Vcujl21UHgZmDSfWJMh9yCzUvPsZOhydl46PTp1I8eWJmKwaIrHP8Qm+GwJsYXK4nh5eH+BeHzZn1sfvcbWvjE0A1Q3f9Q+yeunlxlPohQ+3zZFBB8/2cD4Psk1zL/fNwUWQ++5fSgUEmg7q3ZfYx8jBcegI8g3whcmstZJNuTaAz6ARUm4sATsA9XLP0U8RcOR876I2smWpdGA9i6ZYQsW2VtpqqfQK/l5hB2Ks/H4J+1xxqpDNiw6O0v+lFw5mPC2f8lkGvFNXg/wo0BYk5QNDpfUJoI2OG5HVEIpY52b0FUd6T6yINYBH0rranptOd2JXL/GwZt9IIgmq0DBLM04K2dw8t8KRNq7J884yX0Alk+vbPm5/A71bC4zYY59asbPcozcvGSqZ+8C2bMWVNzBK/4aoOW2RMKm/WoJRRUY1f4dqYDUxiYITb9JKnHh4BgFikAN70ZwaicOpHOO9MO6T7+N9hnPTyTMwyKUjiPbbes3e1hq1u0UKPDVXw3AGVyGbIXXe/afRQHBDI2RKL+TnwVGljOh/fvmcxusmrlQl3BzjtxaddHVQgWobz1eMHzeVZgT0DjWR2hyYa+VRpLO6+Tp2d4kLwWNQGdw/MMKvK92IKTJt77zmRFbMlV8mN7Y2ogBaE39+bhzgmGg34Dc="
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y graphviz
+  - sudo apt-get install -y graphviz bouncycastle
 script:
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash travis_build.sh; fi'
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bash travis_build_pull_request.sh; fi'
